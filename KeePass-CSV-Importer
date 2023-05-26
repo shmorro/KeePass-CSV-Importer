@@ -1,0 +1,22 @@
+# Variables
+$csvFile = "C:\path\to\your\csvfile.csv"    # Replace with your CSV file path
+$kpscript = "C:\path\to\KPScript\KPScript.exe"   # Replace with your KPScript.exe path
+$database = "C:\path\to\your\KeePassDatabase.kdbx"   # Replace with your KeePass database path
+$masterPassword = "your-master-password"  # Replace with your master password
+$groupName = "GroupName"  # Name of the group where entries will be added
+
+# Read CSV file
+$csvData = Import-Csv -Path $csvFile
+
+# Create a new group for imported entries
+& $kpscript -c:AddGroup -ref-GroupName:"$groupName" -pw:"$masterPassword" $database
+
+# Import entries from CSV
+foreach ($row in $csvData) {
+    $username = $row.'Username [Column A]'
+    $password = $row.'Password [Column B]'
+    $retrievalEmail = $row.'Retrieval Email [Column C]'
+
+    # Add entry to the KeePass database
+    & $kpscript -c:AddEntry -ref-GroupName:"$groupName" -Title:"$username" -UserName:"$username" -Password:"$password" -Notes:"Retrieval Email: $retrievalEmail" -pw:"$masterPassword" $database
+}
